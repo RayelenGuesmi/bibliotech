@@ -68,3 +68,14 @@ Auteur : Rayelen · SUPINFO MSc
 - Hashage bcrypt (sel unique par mot de passe, facteur de coût 12) : mot de passe jamais stocké en clair.
 - Règle métier : refus d'un email déjà enregistré.
 - **Difficulté résolue** : incompatibilité passlib / bcrypt 5.0 → passage à la bibliothèque `bcrypt` en direct.
+
+
+## Phase 7 — Gestion des emprunts (logique métier)
+**Date : 17/09/2026**
+
+- Règle centrale : un livre ne peut être emprunté que s'il est disponible ; l'emprunt le rend indisponible.
+- Retour : marque l'emprunt rendu (date + statut) et rend le livre à nouveau disponible.
+- Protections : livre/utilisateur inexistant, livre indisponible, double retour — traduits en erreurs HTTP 400 explicites.
+- Atomicité : emprunt + changement de disponibilité dans une seule transaction.
+- Historique des emprunts par utilisateur.
+- Scénario complet validé de bout en bout via Swagger.
