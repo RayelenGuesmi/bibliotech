@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.routers import books, users
+from app.routers import books, users, loans
 
 app = FastAPI(
     title="Bibliotech API",
@@ -10,7 +10,7 @@ app = FastAPI(
 
 app.include_router(books.router)
 app.include_router(users.router)
-
+app.include_router(loans.router)
 
 @app.get("/")
 def root():

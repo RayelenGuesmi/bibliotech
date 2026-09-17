@@ -58,3 +58,13 @@ Auteur : Rayelen · SUPINFO MSc
 - **Difficulté rencontrée & résolue** : Oracle n'auto-incrémente pas les clés
   primaires comme Postgres. Correction via colonnes `Identity()` sur les modèles,
   puis régénération de la migration Alembic. Insertion validée (201 Created).
+
+
+## Phase 6 — Gestion des utilisateurs & sécurité des mots de passe
+**Date : 17/09/2026**
+
+- Schémas Pydantic séparant l'entrée (avec mot de passe) de la sortie (sans mot de passe ni hash).
+- Validation du format email via `EmailStr`.
+- Hashage bcrypt (sel unique par mot de passe, facteur de coût 12) : mot de passe jamais stocké en clair.
+- Règle métier : refus d'un email déjà enregistré.
+- **Difficulté résolue** : incompatibilité passlib / bcrypt 5.0 → passage à la bibliothèque `bcrypt` en direct.
