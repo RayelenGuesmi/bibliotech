@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Date, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Date, Boolean, DateTime, Identity
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -8,7 +8,7 @@ from app.database import Base
 class Book(Base):
     __tablename__ = "books"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Identity(), primary_key=True)
     title = Column(String(255), nullable=False, index=True)
     author = Column(String(255), nullable=False, index=True)
     genre = Column(String(100), nullable=True, index=True)

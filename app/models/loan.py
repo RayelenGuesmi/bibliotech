@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey, Identity
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -8,7 +8,7 @@ from app.database import Base
 class Loan(Base):
     __tablename__ = "loans"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Identity(), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
     loan_date = Column(DateTime, default=datetime.utcnow, nullable=False)
