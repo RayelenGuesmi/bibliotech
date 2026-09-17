@@ -47,3 +47,14 @@ Auteur : Rayelen · SUPINFO MSc
 - Génération de la migration initiale par autogenerate.
 - Application à Oracle : tables `USERS`, `BOOKS`, `LOANS` + `ALEMBIC_VERSION` créées.
 - Schéma désormais versionné et reproductible.
+
+## Phase 5 — API REST des livres (Pydantic + FastAPI)
+**Date : 17/09/2026**
+
+- Schémas Pydantic (Create / Read / Update) pour séparer le contrat d'API du modèle BDD.
+- Couche CRUD isolant l'accès aux données des routes.
+- Routeur FastAPI : 5 routes REST (POST, GET liste, GET détail, PUT, DELETE) pour les livres.
+- Documentation Swagger générée automatiquement sur /docs.
+- **Difficulté rencontrée & résolue** : Oracle n'auto-incrémente pas les clés
+  primaires comme Postgres. Correction via colonnes `Identity()` sur les modèles,
+  puis régénération de la migration Alembic. Insertion validée (201 Created).
