@@ -10,6 +10,7 @@ bcrypt
 python-multipart
 pydantic[email]
 requests
-beautifulsoup4pytest
+beautifulsoup4
+pytest
 httpx
 httpx2
