@@ -87,3 +87,26 @@ Auteur : Rayelen · SUPINFO MSc
 - Recherche partielle et insensible à la casse via `ilike` (traduit correctement en `LOWER(...) LIKE LOWER(...)` sous Oracle par SQLAlchemy).
 - Intégration directe dans la route `GET /books/` existante (plutôt qu'une route séparée), avec conservation de la pagination `skip`/`limit`.
 - Validation manuelle via `curl` : filtre par genre (`?genre=Poetry`),par auteur (`?author=baudelaire`), par titre partiel (`?title=fleurs`),casse différente testée avec succès, et cas sans résultat vérifié (`?genre=Fiction` → liste vide).
+
+## Phase 9 — Authentification JWT
+**Date : 29/09/2026**
+
+- Ajout de `create_access_token` et `get_current_user` dans `security.py` (encodage/décodage JWT via `python-jose`, algorithme HS256).
+- Clé secrète et durée d'expiration ajoutées à `Settings` (`.env`, jamais en dur dans le code).
+- Nouvelle route `POST /auth/login` (`OAuth2PasswordRequestForm`) : vérifie l'email et le mot de passe hashé, renvoie un token en cas de succès, `401` sinon.
+- Validation manuelle via `curl` : login réussi avec token renvoyé, échec correctement rejeté avec mauvais mot de passe.
+
+## Phase 10 — Protection d'une route par JWT
+**Date : 29/09/2026**
+
+- Route `GET /loans/user/{user_id}` protégée via `Depends(get_current_user)`.
+- Validation manuelle : requête sans token → 401 "Not authenticated", equête avec token valide (obtenu via `/auth/login`) → 200, liste des emprunts renvoyée.
+
+## Phase 11 — Tests automatisés (pytest)
+**Date : 29/09/2026**
+
+- Mise en place de `pytest` + `httpx` (TestClient FastAPI), exécutés directement sur la base Oracle de dev.
+- Fixtures avec teardown (`tests/conftest.py`) : chaque livre/utilisateur/emprunt créé pour un test est supprimé en base après exécution, pour ne pas polluer les données. Emails générés avec suffixe aléatoire pour éviter les collisions en cas d'échec avant nettoyage.
+- 9 tests couvrant : création/recherche de livres, login (succès/échec), emprunt (rend le livre indisponible), double emprunt refusé (400), retour (rend le livre disponible).
+- **Difficulté résolue** : `ModuleNotFoundError: No module named 'app'` lors de l'exécution de pytest — ajout d'un `pytest.ini` avec `pythonpath = .` pour forcer la racine du projet dans le chemin Python.
+- Résultat : `9 passed` en ~2.3s.

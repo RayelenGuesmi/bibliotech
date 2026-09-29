@@ -10,4 +10,5 @@ bcrypt
 python-multipart
 pydantic[email]
 requests
-beautifulsoup4
+beautifulsoup4pytest
+httpx
