@@ -133,3 +133,12 @@ Auteur : Rayelen · SUPINFO MSc
 - Nouvelle route `GET /loans/overdue` : liste les emprunts non rendus dont la `due_date` est dépassée.
 - **Difficulté résolue** : la première migration autogenerate est sortie vide (`pass`) car le modèle n'avait pas encore été modifié au moment de la génération — annulée et régénérée après correction du modèle. La colonne `due_date` étant `NOT NULL` alors que des emprunts existaient déjà en base, la migration a été adaptée en 3 temps : ajout de la colonne en nullable, backfill via `UPDATE ... loan_date + INTERVAL '14' DAY`, puis passage en `NOT NULL`.
 - Validation manuelle : `due_date` correctement calculée à la création (loan_date + 14 jours) ; retard simulé en base (SQL direct) puis vérifié correctement détecté par `/loans/overdue`.
+
+## Phase 15 — CI GitHub Actions
+**Date : 29/09/2026**
+
+- Ajout de `.github/workflows/tests.yml` : lance `pytest` à chaque push ou pull request.
+- Défi résolu : Oracle trop lourd pour tourner facilement en CI → ajout d'un `database_url_override` optionnel dans `Settings` (`app/config.py`),permettant de basculer vers SQLite via une variable d'environnement sans toucher à la config Oracle habituelle.
+- Migration `due_date` rendue portable Oracle/SQLite : détection du dialecte (`bind.dialect.name`) pour adapter la syntaxe de backfill (`INTERVAL` Oracle vs `datetime()` SQLite), et utilisation du mode batch d'Alembic pour la contrainte `NOT NULL` (SQLite ne supporte pas `ALTER COLUMN` directement).
+- **Difficulté résolue** : `requirements.txt` contenait deux paquets fusionnés par erreur (`beautifulsoup4pytest` au lieu de deux lignes séparées), causant l'échec du premier run CI. Corrigé.
+- Résultat : badge OK passing sur GitHub Actions, run complet en ~20-27s.
