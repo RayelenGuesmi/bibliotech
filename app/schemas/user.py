@@ -19,3 +19,8 @@ class UserRead(UserBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+# Réponse renvoyée après un login réussi
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
