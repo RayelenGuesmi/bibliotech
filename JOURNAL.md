@@ -79,3 +79,11 @@ Auteur : Rayelen · SUPINFO MSc
 - Atomicité : emprunt + changement de disponibilité dans une seule transaction.
 - Historique des emprunts par utilisateur.
 - Scénario complet validé de bout en bout via Swagger.
+
+## Phase 8 — Recherche de livres (titre, auteur, genre)
+**Date : 29/09/2026**
+
+- Ajout de la fonction CRUD `search_books` : filtrage dynamique par `title`,`author` et `genre`, chaque critère étant optionnel et cumulable.
+- Recherche partielle et insensible à la casse via `ilike` (traduit correctement en `LOWER(...) LIKE LOWER(...)` sous Oracle par SQLAlchemy).
+- Intégration directe dans la route `GET /books/` existante (plutôt qu'une route séparée), avec conservation de la pagination `skip`/`limit`.
+- Validation manuelle via `curl` : filtre par genre (`?genre=Poetry`),par auteur (`?author=baudelaire`), par titre partiel (`?title=fleurs`),casse différente testée avec succès, et cas sans résultat vérifié (`?genre=Fiction` → liste vide).
