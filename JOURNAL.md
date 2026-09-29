@@ -110,3 +110,26 @@ Auteur : Rayelen · SUPINFO MSc
 - 9 tests couvrant : création/recherche de livres, login (succès/échec), emprunt (rend le livre indisponible), double emprunt refusé (400), retour (rend le livre disponible).
 - **Difficulté résolue** : `ModuleNotFoundError: No module named 'app'` lors de l'exécution de pytest — ajout d'un `pytest.ini` avec `pythonpath = .` pour forcer la racine du projet dans le chemin Python.
 - Résultat : `9 passed` en ~2.3s.
+
+## Phase 12 — Nettoyage des warnings de dépréciation
+**Date : 29/09/2026**
+
+- Ajout d'une fonction utilitaire `utcnow()` centralisée dans `database.py`(basée sur `datetime.now(timezone.utc).replace(tzinfo=None)`), remplaçant `datetime.utcnow` (déprécié) dans les modèles `User`, `Book`, `Loan`.
+- Installation de `httpx2`, supporté nativement par le TestClient de Starlette, supprimant le `StarletteDeprecationWarning` lié à `httpx`.
+- Résultat : `pytest -v` passe de 17 warnings à 0, sans régression (9 tests toujours PASSED).
+
+## Phase 13 — Pagination et tri des livres
+**Date : 29/09/2026**
+
+- Ajout des paramètres `sort_by` et `order` (asc/desc) à `search_books` et à la route `GET /books/`.
+- Tri restreint à une liste blanche de champs autorisés (`title`, `author`,`genre`, `published_at`, `created_at`) pour éviter toute exposition de champ sensible ou erreur serveur sur un nom de colonne invalide.
+- **Difficulté résolue** : doublon accidentel de la route `GET /books/` dans `routers/books.py` (ancienne version sans tri restée dans le fichier après l'ajout de la nouvelle) — FastAPI utilisait la première définition trouvée, rendant le tri invisible malgré un code correct. Suppression de la définition dupliquée.
+- Validation manuelle via `curl` : tri croissant/décroissant par titre vérifié avec deux livres, champ de tri invalide correctement rejeté (400).
+
+## Phase 14 — Gestion des retards d'emprunt
+**Date : 29/09/2026**
+
+- Ajout du champ `due_date` au modèle `Loan`, calculé à l'emprunt (`loan_date` + 14 jours).
+- Nouvelle route `GET /loans/overdue` : liste les emprunts non rendus dont la `due_date` est dépassée.
+- **Difficulté résolue** : la première migration autogenerate est sortie vide (`pass`) car le modèle n'avait pas encore été modifié au moment de la génération — annulée et régénérée après correction du modèle. La colonne `due_date` étant `NOT NULL` alors que des emprunts existaient déjà en base, la migration a été adaptée en 3 temps : ajout de la colonne en nullable, backfill via `UPDATE ... loan_date + INTERVAL '14' DAY`, puis passage en `NOT NULL`.
+- Validation manuelle : `due_date` correctement calculée à la création (loan_date + 14 jours) ; retard simulé en base (SQL direct) puis vérifié correctement détecté par `/loans/overdue`.

@@ -11,6 +11,7 @@ class Loan(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
     loan_date = Column(DateTime, default=utcnow, nullable=False)
+    due_date = Column(DateTime, nullable=False)
     return_date = Column(DateTime, nullable=True)
     is_returned = Column(Boolean, default=False, nullable=False)
 

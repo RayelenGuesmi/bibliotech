@@ -35,6 +35,9 @@ def user_history(
 ):
     return loan_crud.get_user_loans(db, user_id)
 
+@router.get("/overdue", response_model=list[LoanRead])
+def overdue_loans(db: Session = Depends(get_db)):
+    return loan_crud.get_overdue_loans(db)
 
 @router.get("/{loan_id}", response_model=LoanRead)
 def get_loan(loan_id: int, db: Session = Depends(get_db)):
