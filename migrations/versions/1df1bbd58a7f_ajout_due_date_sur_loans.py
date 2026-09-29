@@ -22,10 +22,23 @@ def upgrade() -> None:
     """Upgrade schema."""
     # Ajoute la colonne d'abord en nullable pour ne pas bloquer sur les lignes existantes
     op.add_column('loans', sa.Column('due_date', sa.DateTime(), nullable=True))
-    # Donne une valeur de secours aux emprunts déjà existants (14 jours après leur loan_date)
-    op.execute("UPDATE loans SET due_date = loan_date + INTERVAL '14' DAY WHERE due_date IS NULL")
-    # Rend la colonne obligatoire maintenant que toutes les lignes ont une valeur
-    op.alter_column('loans', 'due_date', nullable=False)
+
+    bind = op.get_bind()
+    if bind.dialect.name == 'oracle':
+        # Backfill + passage en NOT NULL : Oracle supporte ALTER COLUMN directement
+        op.execute(
+            "UPDATE loans SET due_date = loan_date + INTERVAL '14' DAY WHERE due_date IS NULL"
+        )
+        op.alter_column('loans', 'due_date', nullable=False)
+    else:
+        # SQLite (et autres moteurs limités) : backfill, puis mode batch pour la
+        # contrainte NOT NULL (SQLite ne supporte pas ALTER COLUMN ... SET NOT NULL
+        # directement ; le mode batch recrée la table en coulisses)
+        op.execute(
+            "UPDATE loans SET due_date = datetime(loan_date, '+14 days') WHERE due_date IS NULL"
+        )
+        with op.batch_alter_table('loans') as batch_op:
+            batch_op.alter_column('due_date', nullable=False)
 
 
 def downgrade() -> None:
