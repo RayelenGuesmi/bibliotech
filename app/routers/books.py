@@ -18,13 +18,25 @@ def list_books(
     title: str | None = None,
     author: str | None = None,
     genre: str | None = None,
+    sort_by: str | None = None,
+    order: str = "asc",
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
 ):
-    return book_crud.search_books(
-        db, title=title, author=author, genre=genre, skip=skip, limit=limit
-    )
+    try:
+        return book_crud.search_books(
+            db,
+            title=title,
+            author=author,
+            genre=genre,
+            sort_by=sort_by,
+            order=order,
+            skip=skip,
+            limit=limit,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/{book_id}", response_model=BookRead)

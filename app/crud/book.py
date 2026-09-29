@@ -36,6 +36,8 @@ def search_books(
     title: str | None = None,
     author: str | None = None,
     genre: str | None = None,
+    sort_by: str | None = None,
+    order: str = "asc",
     skip: int = 0,
     limit: int = 100,
 ) -> list[Book]:
@@ -48,6 +50,14 @@ def search_books(
         query = query.filter(Book.author.ilike(f"%{author}%"))
     if genre is not None:
         query = query.filter(Book.genre.ilike(f"%{genre}%"))
+
+    # Tri dynamique sur une colonne autorisée
+    if sort_by is not None:
+        allowed_columns = {"title", "author", "genre", "published_at", "created_at"}
+        if sort_by not in allowed_columns:
+            raise ValueError(f"Tri non supporté sur le champ '{sort_by}'")
+        column = getattr(Book, sort_by)
+        query = query.order_by(column.desc() if order == "desc" else column.asc())
 
     return query.offset(skip).limit(limit).all()
 
