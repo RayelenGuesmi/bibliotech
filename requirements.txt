@@ -12,3 +12,4 @@ pydantic[email]
 requests
 beautifulsoup4pytest
 httpx
+httpx2

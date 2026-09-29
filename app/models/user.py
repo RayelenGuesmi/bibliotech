@@ -1,9 +1,7 @@
-from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Identity
 from sqlalchemy.orm import relationship
 
-
-from app.database import Base
+from app.database import Base, utcnow
 
 
 class User(Base):
@@ -14,7 +12,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     phone = Column(String(20), nullable=True)
     password_hash = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
     # Un utilisateur possède une liste d'emprunts
     loans = relationship("Loan", back_populates="user")
