@@ -14,8 +14,17 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[BookRead])
-def list_books(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return book_crud.get_books(db, skip=skip, limit=limit)
+def list_books(
+    title: str | None = None,
+    author: str | None = None,
+    genre: str | None = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
+    return book_crud.search_books(
+        db, title=title, author=author, genre=genre, skip=skip, limit=limit
+    )
 
 
 @router.get("/{book_id}", response_model=BookRead)
