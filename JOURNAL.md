@@ -142,3 +142,14 @@ Auteur : Rayelen · SUPINFO MSc
 - Migration `due_date` rendue portable Oracle/SQLite : détection du dialecte (`bind.dialect.name`) pour adapter la syntaxe de backfill (`INTERVAL` Oracle vs `datetime()` SQLite), et utilisation du mode batch d'Alembic pour la contrainte `NOT NULL` (SQLite ne supporte pas `ALTER COLUMN` directement).
 - **Difficulté résolue** : `requirements.txt` contenait deux paquets fusionnés par erreur (`beautifulsoup4pytest` au lieu de deux lignes séparées), causant l'échec du premier run CI. Corrigé.
 - Résultat : badge OK passing sur GitHub Actions, run complet en ~20-27s.
+
+
+## Bonus — Ingestion de données par scraping (ETL)
+**Date : 17/09/2026**
+
+- Script d'ingestion `scripts/scrape_books.py` alimentant la base via l'API (POST /books/).
+- Pattern ETL : EXTRACT (HTML via requests) → TRANSFORM (parsing BeautifulSoup) → LOAD (POST API).
+- Scraping en profondeur : visite de la page de détail de chaque livre pour extraire son vrai genre (breadcrumb).
+- Difficultés rencontrées & résolues : encodage UTF-8 mal deviné (£ → Â£), respect du serveur (pause entre requêtes), gestion des catégories génériques du site source.
+- Résultat : ~40 livres réels avec genres variés (Poetry, Thriller, Music, Travel…).
+
