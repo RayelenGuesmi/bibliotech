@@ -5,6 +5,8 @@ from app.database import get_db
 from app.schemas.loan import LoanCreate, LoanRead
 from app.crud import loan as loan_crud
 from app.crud.loan import LoanError
+from app.core.security import get_current_user
+from app.models.user import User
 
 router = APIRouter(prefix="/loans", tags=["Emprunts"])
 
@@ -26,9 +28,16 @@ def return_book(loan_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/user/{user_id}", response_model=list[LoanRead])
-def user_history(user_id: int, db: Session = Depends(get_db)):
+def user_history(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     return loan_crud.get_user_loans(db, user_id)
 
+@router.get("/overdue", response_model=list[LoanRead])
+def overdue_loans(db: Session = Depends(get_db)):
+    return loan_crud.get_overdue_loans(db)
 
 @router.get("/{loan_id}", response_model=LoanRead)
 def get_loan(loan_id: int, db: Session = Depends(get_db)):

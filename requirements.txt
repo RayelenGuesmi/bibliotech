@@ -11,3 +11,6 @@ python-multipart
 pydantic[email]
 requests
 beautifulsoup4
+pytest
+httpx
+httpx2

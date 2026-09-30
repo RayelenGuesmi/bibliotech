@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
@@ -11,6 +12,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # La classe de base dont hériteront tous nos modèles (tables)
 Base = declarative_base()
+
+
+def utcnow() -> datetime:
+    """Horodatage UTC actuel, naïf (sans timezone) pour les colonnes DateTime."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 # Dépendance FastAPI : ouvre une session, la donne à la route, la ferme après
